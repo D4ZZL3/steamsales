@@ -1,0 +1,25 @@
+---
+title: "Steam Sales Project"
+output: html_notebook
+author: Andrew Dai
+date: 11.10.20
+---
+
+```{r}
+library("ggplot2")
+```
+
+```{r}
+
+steam <- read.csv("steam.csv")
+
+cat("Steam dataset has",as.character(nrow(steam)),"rows and",as.character(ncol(steam)),"columns:","\n")
+cat(names(steam), sep=", ")
+
+
+
+
+
+```
+
+
