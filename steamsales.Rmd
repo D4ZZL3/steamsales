@@ -21,6 +21,11 @@ cat(names(steam), sep=", ")
 # Data Cleaning
 ```
 
+```{r}
+# EDA
+```
+
+
 
 
 
