@@ -22,7 +22,7 @@ cat(names(steam), sep=", ")
 ```
 
 ```{r}
-# EDA
+# EDA 
 ```
 
 
