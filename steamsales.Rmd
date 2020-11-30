@@ -16,7 +16,12 @@ steam <- read.csv("steam.csv")
 cat("Steam dataset has",as.character(nrow(steam)),"rows and",as.character(ncol(steam)),"columns:","\n")
 cat(names(steam), sep=", ")
 
-
 ```
+```{r}
+# Data Cleaning
+```
+
+
+
 
 
