@@ -16,13 +16,35 @@ steam <- read.csv("steam.csv")
 cat("Steam dataset has",as.character(nrow(steam)),"rows and",as.character(ncol(steam)),"columns:","\n")
 cat(names(steam), sep=", ")
 
-```
-```{r}
 # Data Cleaning
+
+# lower bound of owners range taken for each value
+steam$owners <- as.integer(gsub("([0-9]+).*$", "\\1", steam$owners))
+steam$release_year <- as.integer(gsub("([0-9]+).*$", "\\1", steam$release_date))
+steam$total_ratings <- steam$positive_ratings+steam$negative_ratings
+
 ```
 
 ```{r}
 # EDA
+# Question: What makes a game popular on Steam?
+# Definition of popular: many regular players
+
+# Hypothesis / Variable Selection
+# Price could be a variable that makes a game popular because it allows anyone with access to Steam to try the game.
+# Positive ratings could be a variable that makes a game popular because it advertises the game to new players.
+# Certain categories and genres could be more preferred than others.
+
+# owners, price, positive_ratings, negative_ratings
+
+plot(steam$price,jitter(log(steam$owners)),xlim=c(0,80))
+plot(jitter(steam$release_year),jitter(log(steam$owners)))
+plot(log(steam$total_ratings),jitter(log(steam$owners)))
+
+```
+
+```{r}
+
 ```
 
 
