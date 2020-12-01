@@ -37,10 +37,11 @@ steam$total_ratings <- steam$positive_ratings+steam$negative_ratings
 
 # owners, price, positive_ratings, negative_ratings
 
-plot(steam$price,jitter(log(steam$owners)),xlim=c(0,80))
-plot(jitter(steam$release_year),jitter(log(steam$owners)))
-plot(log(steam$total_ratings),jitter(log(steam$owners)))
+plot(steam$price,jitter(log(steam$owners),2),xlim=c(0,80))
+plot(jitter(steam$release_year,2),jitter(log(steam$owners),2))
+plot(log(steam$total_ratings),jitter(log(steam$owners),2))
 
+# we need to jitter "owners" because it is in categorical ranges
 ```
 
 ```{r}
