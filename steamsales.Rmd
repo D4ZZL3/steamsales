@@ -1,8 +1,10 @@
 ---
 title: "Steam Sales Project"
-output: html_notebook
 author: Andrew Dai
 date: 11.10.20
+output:
+  pdf_document:
+    fig_caption: true
 ---
 
 ```{r setup, include=FALSE}
@@ -14,6 +16,35 @@ ordinal,
 lme4
 )
 ```
+
+## Abstract 
+
+
+## Introduction
+
+The video game industry has developed significantly since the rise of the home computer. One market in particular which has sprung onto mainstream audiences is the access to downloadable computer games. Valve is a game distributor, among many others, from whom players can purchase and download games. The proliferation of Valve is attributed to their ability to connect individuals on their online platform, Steam, and enable interaction between players. 
+
+Developers publishing their work onto Steam can charge a one time fee for the indefinite access to their game. This access is typically restricted to the player's Steam account and intended for a single person.
+
+With corporations such as Valve, Blizzard, Epic and Riot propping up these digital content markets with their own respecitve platforms, they provide audiences with an enormous library of computer games- a selection process which forces players to be more discriminating towards different titles. Not every game can be treated equally by the average gamer- the truth is that a majority of titles will probably go untested.
+
+Price is one consideration players may have before they choose to purchase a game. When we invest ourselves in a game, we dedicate some amount of resource into actually playing the game through. With a free title, the only downside could be an hour or two of wasted time. However the more expensive a game is, we expect less players to be willing to invest in such a costly risk and so we expect smaller ownership of that title.
+
+Number of players is important for players who value multiplayer games. The most-owned games on Steam are typically massive multiplayer games where a large number of players contribute to the game's activity. More players often leads to a better experience as there is less waiting to begin a match. With a large playerbase, developers are also more likely to push new content and patch existing problems. As a result, games with large ownership tend to be higher rated than games with small ownership. 
+
+Ratings are important to a prospective game buyer. Players are more likely to try a game with positive ratings and pass on a game with negative ratings. Ratings can reflect the value of the game, factoring in quality as well as cost. We can expect games with a large number of positive ratings to be 1) inexpensive and 2) with large ownership. 
+
+As the industry attracts more attention from investors and developers alike, there is a growing interest in what makes certain titles so popular among audiences. Advertising on video game streams is one way that corporations target this audience group to purchase products they are likely to buy.
+
+This report will investigate the question of what makes a game popular on Steam. We will use a multilevel linear model with random effects between game genres. The dataset was taken from the Steamspy API by Nik Davis who published it on Kaggle and performs Exploratory Data Analysis on his blog. (source) Davis has provided valuable insights through his visualization and this report intends to follow-up by 1) checking his EDA with our own and 2) fitting the data to a statistical model. 
+
+## Methods 
+
+## Results
+
+## Discussion
+
+## Bibliography
 
 ```{r}
 
@@ -63,55 +94,36 @@ plot(log(steam$total_ratings),jitter(log(steam$owners),2), main="Effect of total
 # log(owners) ~ beta0 + beta1(price) + beta2(positive_ratings/(positive_ratings+negative_ratings)) + beta3(release_year)
 
 #
+ratings <- steam$positive_ratings/(steam$positive_ratings+steam$negative_ratings)
+score <- (ratings -(ratings*0.5)*2^(-log(steam$total_ratings+1)))
+steam$rating_score <- score*100
 
-steam20 <- data.frame(owners=steam$owners, price=steam$price, ratings=steam$positive_ratings/(steam$positive_ratings+steam$negative_ratings), release_year=steam$release_year, genre=steam$genres)
-steam20$owners <- factor(steam20$owners)
+steam20 <- data.frame(owners=steam$owners, price=steam$price, ratings=steam$positive_ratings/(steam$positive_ratings+steam$negative_ratings),score=steam$rating_score, release_year=steam$release_year, genre=steam$genres)
 
+# removing all games with less than 20000 owners
+steam20 <- steam20[-which(steam20$owners==0),]
 ```
 
 ```{r}
-ggplot(steam20, aes(y = ratings, x = price)) + geom_point() + geom_jitter() + 
+ggplot(steam20, aes(y = score, x = price)) + geom_point() + geom_jitter() + 
   geom_smooth(method=lm) + xlim(0,60)
 
-ggplot(steam20, aes(y = ratings, x = price, color = factor(genre))) + geom_point() + geom_jitter() + 
+ggplot(steam20, aes(y = score, x = price, color = factor(genre))) + geom_point() + geom_jitter() + 
   geom_smooth(method=lm,alpha=0.2) + xlim(0,60)
 
+ggplot(steam20, aes(y = score, x = log(owners))) + geom_point() + geom_jitter() + 
+  geom_smooth(method=lm) 
+
+ggplot(steam20, aes(y = score, x = log(owners), color = factor(genre))) + geom_point() + geom_jitter() + 
+  geom_smooth(method=lm,alpha=0.2)
 
 ```
 
 ```{r}
+#model fitting
 
-# multilevel model or causal inference
-
-# poisson regression
-model <- polr(owners~price+ratings+release_year+(1|factor(genre)),data=steam20)
 
 ```
 
-```{r}
-# Poisson
-plot(predict(model),resid(model), main="Poisson Predicted vs Resids")
-
-rootogram(steam20$owners, predict(model), scale = "raw")
-
-# Negative Binomial 
-plot(predict(model.nb),resid(model.nb), main="Poisson Predicted vs Resids")
-
-rootogram(steam20$owners, predict(model.nb), scale = "raw")
-
-# Zero Inflated
-plot(predict(model.zi),resid(model.zi), main="Poisson Predicted vs Resids")
-
-rootogram(steam20$owners, predict(model.zi), scale = "raw")
-
-```
-
-```{r}
-
-steam20$genre <- factor(steam20$genre,labels=1:10)
-#multilevel model
-model.nb <- glm.nb(owners~price+ratings+release_year+(1|genre),data=steam20)
-
-```
 
 
