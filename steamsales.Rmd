@@ -7,13 +7,23 @@ date: 11.10.20
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-pacman::p_load(
-ggplot2,
-pwr,
-ordinal,
-lme4
-)
+library(ggplot2)
+library(pwr)
+library(MASS)
+library(pscl)
+library(vcd)
+library(boot)
+library(VGAM)
+library(AER)
+library(rstanarm)
 ```
+
+Introduction
+The video game industry has developed significantly since the invention of the home computer. One market in particular which has sprung into mainstream audiences is the market for downloadable computer games. Steam is an online platform where players can purchase and download games, create friends lists, and chat with other players. On Steam, there is a marketplace where developers can publish their work and put a price on their products. As the industry attracts more attention from investors and developers alike, there is a growing interest in what makes certain titles so popular among audiences.
+
+This report will investigate the question of what makes a game popular on Steam. Our definition of popular is a large number of people who own the game. We choose this definition over others because the biggest titles on Steam are typically massive multiplayer games where a large number of owners contribute to the game's status and health. With a large playerbase, developers are more likely to push new content and patch existing problems because there are more people who experience them. 
+
+We will use a multilevel ordinal model with random effects between game genres. The dataset is taken from the Steamspy API by Nik Davis who published it on Kaggle and analyzes it in his own blog. (source) Davis has provided valuable insights to the data through his own EDA, which looks at the effect of price and ownership on computed rating scores. 
 
 ```{r}
 
@@ -29,23 +39,12 @@ steam$owners <- as.integer(gsub("([0-9]+).*$", "\\1", steam$owners))
 steam$release_year <- as.integer(gsub("([0-9]+).*$", "\\1", steam$release_date))
 steam$total_ratings <- steam$positive_ratings+steam$negative_ratings
 
-steam$genres <- strsplit(steam$genres, ";")
-number_of_genre_tags <- sapply(steam$genres,function(x) length(x))
-steam <- steam[which(number_of_genre_tags==1),]
-steam$genres <- unlist(steam$genres)
-genre_tags <- c("Action", "Indie", "Strategy", "RPG", "Racing", "Casual", "Adventure", "Sports", "Simulation", "Free to Play")
+# steam$genres <- strsplit(steam$genres, ";")
+# sum(table(grep("Action",steam$genres)))
 
-steam <- steam[sort(unlist(sapply(1:10,function(x) which(steam$genres==genre_tags[x])))),]
-rownames(steam) <- 1:nrow(steam)
-
-# keeping only games with 1 genre tag for simplicity's sake
-# because games with multiple genre tags may be overlapping in groups
-# keeping only 10 genres of games: Action, Indie, Strategy, RPG, Racing, Casual, Adventure, Sports, Simulation and Free to Play
-
-
-plot(steam$price,jitter(log(steam$owners),2),xlim=c(0,80), main="Effect of price on log(owners)")
-plot(jitter(steam$release_year,2),jitter(log(steam$owners),2), main="Effect of release year on log(owners)")
-plot(log(steam$total_ratings),jitter(log(steam$owners),2), main="Effect of total ratings on log(owners)", ylab="log(owners)", xlab="")
+plot(steam$price,jitter(log(steam$owners),2),xlim=c(0,80), main="Effect of price on owners")
+plot(jitter(steam$release_year,2),jitter(log(steam$owners),2), main="Effect of release year on owners")
+plot(log(steam$total_ratings),jitter(log(steam$owners),2), main="Effect of total ratings on owners", ylab="log(owners)", xlab="")
 
 
 ```
@@ -65,8 +64,7 @@ plot(log(steam$total_ratings),jitter(log(steam$owners),2), main="Effect of total
 
 #
 
-steam20 <- data.frame(owners=steam$owners, price=steam$price, ratings=steam$positive_ratings/(steam$positive_ratings+steam$negative_ratings), release_year=steam$release_year, genre=steam$genres)
-steam20$owners <- factor(steam20$owners)
+steam <- data.frame(owners=steam$owners, price=steam$price, ratings=steam$positive_ratings/(steam$positive_ratings+steam$negative_ratings), release_year=steam$release_year)
 ```
 
 ```{r}
@@ -74,33 +72,29 @@ steam20$owners <- factor(steam20$owners)
 # multilevel model or causal inference
 
 # poisson regression
-model <- polr(owners~price+ratings+release_year+(1|factor(genre)),data=steam20)
+model <- glm(owners~price+ratings+release_year,family="poisson"(link="log"),data=steam)
+model.nb <- glm.nb(owners~price+ratings+release_year,data=steam)
+model.zi <- zeroinfl(owners~price+ratings+release_year,data=steam)
 
 ```
 
 ```{r}
-# Poisson
 plot(predict(model),resid(model), main="Poisson Predicted vs Resids")
 
-rootogram(steam20$owners, predict(model), scale = "raw")
+# the residuals appear to be underdispersed 
 
-# Negative Binomial 
+vcd::rootogram(steam$owners, predict(model), scale = "raw")
+
 plot(predict(model.nb),resid(model.nb), main="Poisson Predicted vs Resids")
 
-rootogram(steam20$owners, predict(model.nb), scale = "raw")
+# still out of 2 sd band
+vcd::rootogram(steam$owners, predict(model.nb), scale = "raw")
 
-# Zero Inflated
 plot(predict(model.zi),resid(model.zi), main="Poisson Predicted vs Resids")
 
-rootogram(steam20$owners, predict(model.zi), scale = "raw")
+# The zero-inflated model seems to fit our data better.
 
-```
-
-```{r}
-
-steam20$genre <- factor(steam20$genre,labels=1:10)
-#multilevel model
-model.nb <- glm.nb(owners~price+ratings+release_year+(1|genre),data=steam20)
+vcd::rootogram(steam$owners, predict(model.zi), scale = "raw")
 
 ```
 
