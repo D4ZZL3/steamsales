@@ -44,6 +44,8 @@ ratings <- steam$positive_ratings/(steam$positive_ratings+steam$negative_ratings
 score <- (ratings -(ratings*0.5)*2^(-log(steam$total_ratings+1)))
 steam$rating_score <- score*100
 
+# SteamDB: https://steamdb.info/blog/steamdb-rating/
+
 steam20 <- data.frame(owners=steam$owners, price=steam$price, ratings=steam$positive_ratings/(steam$positive_ratings+steam$negative_ratings),score=steam$rating_score, release_year=steam$release_year, genre=steam$genres)
 
 # removing all games with less than 20000 owners
@@ -53,7 +55,7 @@ steam20 <- steam20[-which(steam20$owners==0),]
 
 # Abstract 
 
-Growing interest in the video game industry has attracted significant investment from investors, developers and players alike. Certain titles are known to more widely owned, and more positively rated by players. Price is an important consideration when players make purchasing decisions on the game they buy. Steam is a game distributor and online platform that allows users to purchase and play downloadable video games. This report will use a multilevel linear model to see how a game's ownership and price effect it's rating score, accounting for random effects between genres. The results found that there was no relationship between ownership levels and rating score and a small positive relationship between price and rating score. 
+Growing interest in the video game industry has attracted significant attention from investors, developers and players alike. Certain titles are known to be more popular among players than others and price plays an important role when players choose the games they buy. Steam is an online platform where users can purchase and play downloadable video games. Data was collected from the Steam API and records Steam game sales from May of 2019. This report will use a multilevel linear model to see how a game's ownership and price effect it's rating score, accounting for random effects between genres. The results found that there was no relationship between ownership levels and rating score and a small positive relationship between price and rating score. 
 
 # Introduction
 
