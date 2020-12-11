@@ -110,7 +110,7 @@ Figure 2: the effect of ownership on rating score, grouped by genre. Games with 
 
 # Results
 
-Our linear mixed model indicates a game with a price and ownership of 0 will have a rating score of 68 points. A dollar increase in price corresponds with a 0.2 increase in rating score. An increase of one owner in a game has no corresponding change in rating score. From the figures below, we can see the different fits from complete pooling to no pooling.
+Our linear mixed model indicates a game with a price and ownership of 0 will have a rating score of 68 points. A dollar increase in price corresponds with a 0.2 increase in rating score. An increase of one owner in a game has no corresponding change in rating score. From the figures below, we can see the different fits from complete pooling to no pooling. Overall, when we consider the multilevel linear model, there are random effects between genres that do not correspond with the trend of the overall data. 
 
 ## Model Checking
 
@@ -144,7 +144,7 @@ The no relationship between ownership and rating score is unexpected, but unders
 
 The relationship between price and rating score is expected as we hypothesized that more expensive games tend to produce higher quality games and achieve better ratings. 
 
-Some limitations to this dataset in fitting our model is the low frequency of more expensive titles and low frequency of games with large number of owners. The variation of data appears to be heteroskedastic and the assumptions of a linear model could be violated. 
+Some limitations to this dataset in fitting our model is the low frequency of more expensive titles and low frequency of games with large number of owners. The variation of data appears to be heteroskedastic and the assumptions of a linear model could be violated. Additionally the genre "Free to Play" has no data points beyond a price of zero so the use of a linear model does not provide any meaningful insights to the genre. Some recommendations for a future analysis are to develop the partial to no pooling model as there are closer similarities in certain genres than others. For example, "Action" and "Adventure" are contextually more similar than "Simulation" is to "Sports".
 
 # Bibliography
 
