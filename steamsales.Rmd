@@ -95,12 +95,12 @@ This method pulls ratings towards 50%, meaning that a game with 0 reviews will h
 
 We begin our analysis with an initial Exploratory Data Analysis to see generally what is going on in our subset data.
 
-```{r,fig.height=4}
+```{r,fig.height=3.5}
 ggplot(steam20, aes(y = score, x = price, color=genre)) + geom_point() + geom_jitter() + labs(y= "Rating score", x="Price", title="Effect of price on rating score")
 ```
 Figure 1: the effect of price on rating score, grouped by genre. A majority of our data exists with a rating score above 50 and price less than 30.
 
-```{r,fig.height=4}
+```{r,fig.height=3.5}
 
 ggplot(steam20, aes(y = score, x = log(owners), color=genre)) + geom_point() + geom_jitter() + labs(y= "Rating score", x="Log owners", title="Effect of ownership on rating score")
 
@@ -113,7 +113,7 @@ Our linear mixed model indicates a game with a price and ownership of 0 will hav
 
 ## Model Checking
 
-The distribution of our residuals centers around 0, however the variation exceeds our -2 to 2 standard error band.
+The distribution of our residuals centers around 0, however the variation exceeds our -2 to 2 standard error band.(Appendix A)
 
 ```{r}
 model <- lmer(score~price+owners+(1|genre),data=steam20)
@@ -122,14 +122,14 @@ model <- lmer(score~price+owners+(1|genre),data=steam20)
 
 ```
 
-```{r, fig.height=4}
+```{r, fig.height=3.5}
 ggplot(steam20, aes(y = score, x = price)) + geom_point() + geom_jitter() + 
   geom_smooth(method=lm,se=F) + labs(y= "Rating score", x="Price", title="Effect of price on rating score")
 ```
 
 Figure 3: Price linear fit with complete pooling
 
-```{r, fig.height=4}
+```{r, fig.height=3.5}
 ggplot(steam20, aes(y = score, x = price, color = genre)) + geom_point() + geom_jitter() + 
   geom_smooth(method=lm,alpha=0.2,se=F) + labs(y= "Rating score", x="Price", title="Effect of price on rating score")+ theme(legend.position = "none")+ylim(0,100)
 ```
@@ -139,7 +139,7 @@ Figure 4: Price linear multilevel fit with no pooling
 
 When predicting rating score as a function of price and ownership in our mixed linear model, there is zero effect of ownership on the rating score. Some genres, like Sports, have a negative relationship between rating score and our predictors. This means that as Sports games become more expensive and accumulate more players, their rating score decreases. For price, there is an effect size of 0.2 on a game's rating score. 
 
-The no relationship between ownership and rating score is unexpected, but understandable given the large variability of rating score in games with low ownership. The errors are too large to suggest a linear relationship between ownership and rating score, despite expensive games having positive ratings. 
+The no relationship between ownership and rating score is unexpected, but understandable given the large variability of rating score in games with low ownership. The errors are too large to suggest a linear relationship between ownership and rating score, despite expensive games having positive ratings. (Appendix B and C)
 
 The relationship between price and rating score is expected as we hypothesized that more expensive games tend to produce higher quality games and achieve better ratings. 
 
